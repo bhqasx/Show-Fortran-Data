@@ -38,32 +38,33 @@ if yn_video==1
 end
 
 jump=1;
-flag_first=1;
 while file_id>=3           %open successfully
     while ~feof(file_id)
         tline=fgetl(file_id);
         g_title=tline;       %title to be shown in the graph
         tline=fgetl(file_id);
         hn=textscan(tline,'%s');
-        if (flag_first==1)
-            n_head=length(hn{1});
-            head_col.dist=get_head_col('DistLG(km)');
-            head_col.zb_av=get_head_col('ZBmin(m)');
-            head_col.csqq=get_head_col('QD(m3/s)');
-            head_col.cszw=get_head_col('ZW(m)');
-            head_col.csBW=get_head_col('BW(m)');
-            head_col.sus=get_head_col('CSSUS');
-            head_col.scc=get_head_col('CSSCC');
-            head_col.idx_plg=get_head_col('IdxPlunge');
-            if DrawMode~=1
-                head_col.tb_zi=get_head_col('TbZI');
-                head_col.tbqq=get_head_col('TbQQ');
-                head_col.tbsus=get_head_col('TbSUS');
-                head_col.NetSFlx=get_head_col('NetSFlx');
-            end
-            flag_first=0;
-        end
+      
+        n_head=length(hn{1});
+        head_col.dist=get_head_col('DistLG(km)');
+        head_col.zb_av=get_head_col('ZBmin(m)');
+        head_col.csqq=get_head_col('QD(m3/s)');
+        head_col.cszw=get_head_col('ZW(m)');
+        head_col.csBW=get_head_col('BW(m)');
+        head_col.sus=get_head_col('CSSUS');
+        head_col.scc=get_head_col('CSSCC');
+        head_col.idx_plg=get_head_col('IdxPlunge');
         
+        head_col.tb_zi=get_head_col('TbZI');
+        head_col.tbqq=get_head_col('TbQQ');
+        head_col.tbsus=get_head_col('TbSUS');
+        head_col.NetSFlx=get_head_col('NetSFlx');
+        
+        DrawMode=DrawMode0;
+        if (head_col.tb_zi==0&&DrawMode~=1) 
+            DrawMode=1;
+        end
+                      
         for k=1:1:nCS
             tline=fgetl(file_id);
             a=textscan(tline,'%f');
@@ -239,6 +240,10 @@ for j=1:n_head
         kkk=j;
         break;
     end
+end
+
+if kkk==1      %head not found
+    kkk=0;
 end
 
 end
