@@ -1,22 +1,18 @@
-function ShowFig
-clear all;
-yn_video=0;        %create a video or not
-FrameJump=8;        %frame refreshing rate
+function ShowFig(handles)
+FrameJump=6;        %frame refreshing rate
 DrawMode=1;         %=0, draw turbidity current and open channel current; =1, only draw open channel; =2 only draw the levels of surface and and interface.
                                %0 and 1 are determined automatically
 
 nfile=0;
 file_id=fopen(['FCSLPF  ',num2str(nfile),'.TXT']);
-S1=char('Choose a DrawMode',...
-              '=0, draw turbidity current and open channel current',...
-              '=1, only draw open channel',...
-              '=2, only draw the levels of surface and and interface');
-prompt={'Input the number of cross sections',S1, 'nplg_lim'};
-dlg_ans=inputdlg(prompt,'Input',1,{'','0', '0'});
-nCS=str2num(dlg_ans{1});
-DrawMode=str2num(dlg_ans{2});
+
+%get user's setting
+nCS=handles.nCS;
+nplg_lim=handles.nplg_lim;             %限制潜入位置
+DrawMode=handles.DrawMode;
 DrawMode0=DrawMode;
-nplg_lim=str2num(dlg_ans{3});             %限制潜入位置
+filter=handles.filter;        %=1时，含沙量小于3kg/m3部分的异重流不画
+yn_video=handles.yn_video;
 
 zb_av=zeros(1,nCS);
 csqq=zeros(1,nCS);
@@ -32,9 +28,13 @@ tbsus=zeros(1,nCS);                   %concentration of suspended load(kg/m3)
 NetSFlx=zeros(1,nCS);                %垂向泥沙净通量
 
 first_flag=1;        %flag to mark the first step
+
+figure;
+set(gcf,'WindowButtonDownFcn',@LeftClickFcn);
 if yn_video==1
     vidObj=VideoWriter('TbVideo.avi');
     open(vidObj);
+    set(gcf,'Position',[680,558,1000,420]);        %set the figure size
 end
 
 jump=1;
@@ -169,6 +169,9 @@ while file_id>=3           %open successfully
               return;
           end
           set(gcf,'CurrentCharacter','a');
+       elseif c_char==' '
+          pause;
+          set(gcf,'CurrentCharacter','a');
        end
     end
     fclose(file_id);
@@ -190,6 +193,18 @@ if npt_plg~=0
     plot(dist(npt_plg),cszw(npt_plg),'co');            %标记潜入点
 end
 if any(tb_zi>0)==1       %plot the interface
+    if filter==1
+        for i=npt_plg+1:1:nCS
+            if (tbsus(i)<3.0)
+                tb_zi(i)=zb_av(i);
+            end
+        end
+        for i=npt_plg+1:1:nCS-1
+            if (tbsus(i-1)<3.0)&&(tbsus(i+1)<3.0)&&(tbsus(i)>=3.0)
+                tb_zi(i)=zb_av(i);
+            end
+        end
+    end
     plot(dist(npt_plg+1:end),tb_zi(npt_plg+1:end),'k-');
 end
 plot(dist,zb_av,'b-');
@@ -203,31 +218,33 @@ end
 %-----------------------nested function----------------------------
  function draw_open_chan
  
- subplot(2,2,[1 2]);              %拉长单幅图
+%  subplot(2,2,[1 2]);              %拉长单幅图
  plot(dist,cszw,'m-');
  hold on;
  plot(dist,zb_av,'b-');
- if npt_plg~=0
-    hold on; 
-    plot(dist(npt_plg),cszw(npt_plg),'co');            %标记潜入点
- end
- title(g_title);
+%  if npt_plg~=0
+%     hold on; 
+%     plot(dist(npt_plg),cszw(npt_plg),'co');            %标记潜入点
+%  end
+%  title(g_title);
  hold off;
  
- subplot(2,2,3);
- plot(dist,csqq,'b-');
- hold on;
- plot([dist(1),dist(end)],[0,0]);           %添加0网格线
- title('CSQQ');
- hold off;
- 
- subplot(2,2,4);
- plot(dist,sus,'g-');
- hold on;
- plot(dist,scc,'k-');
- hold off;
- title('SUS and SCC');
-     
+%  subplot(2,2,3);
+%  plot(dist,csqq,'b-');
+%  hold on;
+%  plot([dist(1),dist(end)],[0,0]);           %添加0网格线
+%  title('CSQQ');
+%  hold off;
+%  
+%  subplot(2,2,4);
+%  plot(dist,sus,'g-');
+%  hold on;
+%  plot(dist,scc,'k-');
+%  hold off;
+%  title('SUS and SCC');
+axis([-inf,inf,-inf,inf]);            %adjust the axis
+set(gca,'Xtick',min(dist):10:max(dist));           %设置分度数字标识
+ title(g_title);    
  end
 %-----------------------------------------------------------------------
 %-----------------------nested function----------------------------
@@ -248,6 +265,11 @@ end
 
 end
 %-----------------------------------------------------------------------
+end
+
+
+function LeftClickFcn(hObject,callbackdata)
+% pause;
 end
 
         
