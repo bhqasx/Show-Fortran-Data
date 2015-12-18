@@ -3,7 +3,8 @@ function ExtractOneCS
 
 FrameJump=160;        %frame refreshing rate
 nCS=56;    %total number of cross-sections in computational domain
-iCS=56;      %number of cross-section to extract data from
+iCS=49;      %number of cross-section to extract data from
+t_start=330;     %time to extract data;
 field_o='TbFrd';       %variable to be output
 
 nfile=0;
@@ -30,24 +31,26 @@ while file_id>=3           %open successfully
             tb_flag=1;
         end
         
-        for k=1:1:nCS
-            tline=fgetl(file_id);
-            a=textscan(tline,'%f');
-            
-            if k==iCS
-                 if tb_flag==1
-                     y=a{1}(icol_o);       %read the variable requierd by user
-                 end
+        a=textscan(g_title,'%s%f%s%s%f');
+        x=a{2}(1);        %get time
+              
+        if (jump>=FrameJump)&&(tb_flag==1)&&(x>=t_start)
+            for k=1:1:nCS
+                tline=fgetl(file_id);
+                
+                if k==iCS
+                    a=textscan(tline,'%f');                    
+                    y=a{1}(icol_o);       %read the variable requierd by user
+                end
             end
-        end
-   
-        if (jump>=FrameJump)&&(tb_flag==1)
-            a=textscan(g_title,'%s%f%s%s%f');
-            x=a{2}(1);        %get time 
+            
             x_out=[x_out;x];
             y_out=[y_out;y];
-            jump=1;
+            jump=1;           
         else
+            for k=1:1:nCS
+                tline=fgetl(file_id);
+            end
             jump=jump+1;
         end       
     end
