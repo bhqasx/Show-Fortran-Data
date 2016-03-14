@@ -29,7 +29,7 @@ NetSFlx=zeros(1,nCS);                %´¹ÏòÄàÉ³¾»Í¨Á¿
 
 first_flag=1;        %flag to mark the first step
 
-figure;
+fh=figure;
 set(gcf,'WindowButtonDownFcn',@LeftClickFcn);
 if yn_video==1
     vidObj=VideoWriter('TbVideo.avi');
@@ -38,6 +38,7 @@ if yn_video==1
 end
 
 jump=1;
+
 while file_id>=3           %open successfully
     while ~feof(file_id)
         tline=fgetl(file_id);
@@ -112,6 +113,7 @@ while file_id>=3           %open successfully
         end
 %------------------------------plot----------------------------------
        if jump==FrameJump
+           figure(fh);           %set current figue
            if DrawMode==0
                subplot(3,2,1);
                draw_zw;
