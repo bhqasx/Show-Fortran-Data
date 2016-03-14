@@ -1,5 +1,5 @@
 function ShowFig(handles)
-FrameJump=6;        %frame refreshing rate
+FrameJump=4;        %frame refreshing rate
 DrawMode=1;         %=0, draw turbidity current and open channel current; =1, only draw open channel; =2 only draw the levels of surface and and interface.
                                %0 and 1 are determined automatically
 
