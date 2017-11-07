@@ -1,10 +1,14 @@
-function [dist, zb_av0, zb_av, zw_max]=ShowFig(handles)
-FrameJump=4;        %frame refreshing rate
+function ShowFig_from2D(handles)
+%从二维模型输出结果(_LGPT文件）中画纵剖面图
+FrameJump=2;        %frame refreshing rate
 DrawMode=1;         %=0, draw turbidity current and open channel current; =1, only draw open channel; =2 only draw the levels of surface and and interface.
                                %0 and 1 are determined automatically
 
 nfile=0;
-file_id=fopen(['FCSLPF',num2str(nfile),'.TXT']);
+[filename,path,FilterIndex]=uigetfile('','Choose a file');
+file_id=fopen([path,filename]);
+nimage=0;
+fname_gif='MatlabGIF.gif';
 
 %get user's setting
 nCS=handles.nCS;
@@ -13,11 +17,11 @@ DrawMode=handles.DrawMode;
 DrawMode0=DrawMode;
 filter=handles.filter;        %=1时，含沙量小于3kg/m3部分的异重流不画
 yn_video=handles.yn_video;
+yn_gif=handles.yn_gif;
 
 zb_av=zeros(1,nCS);
 csqq=zeros(1,nCS);
 cszw=zeros(1,nCS);
-zw_max=zeros(1,nCS);
 dist=zeros(1,nCS);
 csBW=zeros(1,nCS);
 sus=zeros(1,nCS);
@@ -37,10 +41,14 @@ if yn_video==1
     open(vidObj);
     set(gcf,'Position',[680,558,1000,420]);        %set the figure size
 end
+if yn_gif==1
+     set(gcf,'Position',[680,558,1000,320]);
+end
 
 jump=1;
 
 while file_id>=3           %open successfully
+    tline=fgetl(file_id);
     while ~feof(file_id)
         tline=fgetl(file_id);
         g_title=tline;       %title to be shown in the graph
@@ -49,20 +57,20 @@ while file_id>=3           %open successfully
       
         n_head=length(hn{1});
         head_col.dist=get_head_col('DistLG(km)');
-        head_col.zb_av=get_head_col('ZBmin(m)');
+        head_col.zb_av=get_head_col('Zbed');
         head_col.csqq=get_head_col('QD(m3/s)');
-        head_col.cszw=get_head_col('ZW(m)');
+        head_col.cszw=get_head_col('ZW');
         head_col.csBW=get_head_col('BW(m)');
         head_col.sus=get_head_col('CSSUS');
         head_col.scc=get_head_col('CSSCC');
-        head_col.idx_plg=get_head_col('IdxPlunge');
-        
+        head_col.idx_plg=get_head_col('IdxPlunge');       
+ 
         head_col.tb_zi=get_head_col('TbZI');
         head_col.tbqq=get_head_col('TbQQ');
         head_col.tbsus=get_head_col('TbSUS');
-        head_col.NetSFlx=get_head_col('NetSFlx');
+        head_col.NetSFlx=get_head_col('NetSFlx');   
         
-        DrawMode=DrawMode0;
+        DrawMode=DrawMode0;        
         if (head_col.tb_zi==0&&DrawMode~=1) 
             DrawMode=1;
         end
@@ -72,12 +80,11 @@ while file_id>=3           %open successfully
             a=textscan(tline,'%f');
             dist(k)=a{1}(head_col.dist);       %extract x coordinate of CS
             zb_av(k)=a{1}(head_col.zb_av); 
-            csqq(k)=a{1}(head_col.csqq);
+            %csqq(k)=a{1}(head_col.csqq);
             cszw(k)=a{1}(head_col.cszw);
-            zw_max(k)=max([zw_max(k), cszw(k)]);
-            csBW(k)=a{1}(head_col.csBW);
-            sus(k)=a{1}(head_col.sus);
-            scc(k)=a{1}(head_col.scc);
+            %csBW(k)=a{1}(head_col.csBW);
+            %sus(k)=a{1}(head_col.sus);
+            %scc(k)=a{1}(head_col.scc);
             try
                 idx_plg(k)=a{1}(head_col.idx_plg);       %if the colume of idx_plg exsits, the turbidity current exsits
                 MarkPP=1;
@@ -111,11 +118,11 @@ while file_id>=3           %open successfully
             zb_av0=zb_av;
             cszw0=cszw;
             csBW0=csBW;
-            first_flag=0;
+            firt_flag=0;
         end
 %------------------------------plot----------------------------------
        if jump==FrameJump
-           set(0,'CurrentFigure',fh)          %set current figue, this trick instead of figure(fh) helps to prevent the current figure getting focus over and over again
+           figure(fh);           %set current figue
            if DrawMode==0
                subplot(3,2,1);
                draw_zw;
@@ -157,8 +164,19 @@ while file_id>=3           %open successfully
                currFrame=getframe(gcf);
                writeVideo(vidObj,currFrame);
            end
+           if yn_gif==1
+               currFrame=getframe(gcf);
+               im = frame2im(currFrame);
+               [imind,cm] = rgb2ind(im,256);
+               if nimage==0
+                   imwrite(imind,cm,fname_gif,'gif', 'Loopcount',inf);
+               else
+                   imwrite(imind,cm,fname_gif,'gif','WriteMode','append');
+               end
+           end
            pause(0.0001);
            jump=1;
+           nimage=nimage+1;
        else
            jump=jump+1;
        end
@@ -180,7 +198,7 @@ while file_id>=3           %open successfully
     end
     fclose(file_id);
     nfile=nfile+1;
-    file_id=fopen(['FCSLPF',num2str(nfile),'.TXT']);
+    file_id=fopen(['FCSLPF  ',num2str(nfile),'.TXT']);
 end
 
 disp('finished');
@@ -222,10 +240,10 @@ end
 %-----------------------nested function----------------------------
  function draw_open_chan
  
- subplot(2,2,[1 2]);              %拉长单幅图
+%  subplot(2,2,[1 2]);              %拉长单幅图
  plot(dist,cszw,'m-');
  hold on;
- plot(dist,zb_av,'bo-');
+ plot(dist,zb_av,'b-');
 %  if npt_plg~=0
 %     hold on; 
 %     plot(dist(npt_plg),cszw(npt_plg),'co');            %标记潜入点
@@ -233,19 +251,19 @@ end
 %  title(g_title);
  hold off;
  
- subplot(2,2,3);
- plot(dist,csqq,'b-');
- hold on;
- plot([dist(1),dist(end)],[0,0]);           %添加0网格线
- title('CSQQ');
- hold off;
- 
- subplot(2,2,4);
- plot(dist,sus,'g-');
- hold on;
- plot(dist,scc,'k-');
- hold off;
- title('SUS and SCC');
+%  subplot(2,2,3);
+%  plot(dist,csqq,'b-');
+%  hold on;
+%  plot([dist(1),dist(end)],[0,0]);           %添加0网格线
+%  title('CSQQ');
+%  hold off;
+%  
+%  subplot(2,2,4);
+%  plot(dist,sus,'g-');
+%  hold on;
+%  plot(dist,scc,'k-');
+%  hold off;
+%  title('SUS and SCC');
 axis([-inf,inf,-inf,inf]);            %adjust the axis
 set(gca,'Xtick',min(dist):10:max(dist));           %设置分度数字标识
  title(g_title);    

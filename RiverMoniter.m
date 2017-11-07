@@ -22,7 +22,7 @@ function varargout = RiverMoniter(varargin)
 
 % Edit the above text to modify the response to help RiverMoniter
 
-% Last Modified by GUIDE v2.5 12-Dec-2015 11:47:18
+% Last Modified by GUIDE v2.5 17-Oct-2017 21:56:07
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -183,7 +183,9 @@ function pushbutton1_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-ShowFig(handles);
+[dist, zb_av0, zb_av, zw_max]=ShowFig(handles);
+save('show_fig_output.mat', 'dist', 'zb_av0', 'zb_av', 'zw_max');
+guidata(hObject, handles);
 
 
 % --- Executes on button press in checkbox3.
