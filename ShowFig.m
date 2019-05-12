@@ -95,7 +95,15 @@ while file_id>=3           %open successfully
                 NetSFlx(k)=a{1}(head_col.NetSFlx);
             end
         end
-       
+        
+        if first_flag==1         %record the initial state
+            dist0=dist;
+            zb_av0=zb_av;
+            cszw0=cszw;
+            csBW0=csBW;
+            first_flag=0;
+        end        
+        
         if (DrawMode~=1)||(MarkPP==1)
             npt_plg=0;
             for k=1:1:nCS
@@ -104,15 +112,7 @@ while file_id>=3           %open successfully
                     break;
                 end
             end
-        end
-        
-        if first_flag==1         %record the initial state
-            dist0=dist;
-            zb_av0=zb_av;
-            cszw0=cszw;
-            csBW0=csBW;
-            first_flag=0;
-        end
+        end        
 %------------------------------plot----------------------------------
        if jump==FrameJump
            set(0,'CurrentFigure',fh)          %set current figue, this trick instead of figure(fh) helps to prevent the current figure getting focus over and over again
