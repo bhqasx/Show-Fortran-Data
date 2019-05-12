@@ -1,10 +1,10 @@
-function ShowFig(handles)
+function [dist, zb_av0, zb_av, zw_max]=ShowFig(handles)
 FrameJump=4;        %frame refreshing rate
 DrawMode=1;         %=0, draw turbidity current and open channel current; =1, only draw open channel; =2 only draw the levels of surface and and interface.
                                %0 and 1 are determined automatically
 
 nfile=0;
-file_id=fopen(['FCSLPF  ',num2str(nfile),'.TXT']);
+file_id=fopen(['FCSLPF',num2str(nfile),'.TXT']);
 
 %get user's setting
 nCS=handles.nCS;
@@ -17,6 +17,7 @@ yn_video=handles.yn_video;
 zb_av=zeros(1,nCS);
 csqq=zeros(1,nCS);
 cszw=zeros(1,nCS);
+zw_max=zeros(1,nCS);
 dist=zeros(1,nCS);
 csBW=zeros(1,nCS);
 sus=zeros(1,nCS);
@@ -73,6 +74,7 @@ while file_id>=3           %open successfully
             zb_av(k)=a{1}(head_col.zb_av); 
             csqq(k)=a{1}(head_col.csqq);
             cszw(k)=a{1}(head_col.cszw);
+            zw_max(k)=max([zw_max(k), cszw(k)]);
             csBW(k)=a{1}(head_col.csBW);
             sus(k)=a{1}(head_col.sus);
             scc(k)=a{1}(head_col.scc);
@@ -109,11 +111,11 @@ while file_id>=3           %open successfully
             zb_av0=zb_av;
             cszw0=cszw;
             csBW0=csBW;
-            firt_flag=0;
+            first_flag=0;
         end
 %------------------------------plot----------------------------------
        if jump==FrameJump
-           figure(fh);           %set current figue
+           set(0,'CurrentFigure',fh)          %set current figue, this trick instead of figure(fh) helps to prevent the current figure getting focus over and over again
            if DrawMode==0
                subplot(3,2,1);
                draw_zw;
@@ -178,7 +180,7 @@ while file_id>=3           %open successfully
     end
     fclose(file_id);
     nfile=nfile+1;
-    file_id=fopen(['FCSLPF  ',num2str(nfile),'.TXT']);
+    file_id=fopen(['FCSLPF',num2str(nfile),'.TXT']);
 end
 
 disp('finished');
@@ -220,10 +222,10 @@ end
 %-----------------------nested function----------------------------
  function draw_open_chan
  
-%  subplot(2,2,[1 2]);              %拉长单幅图
+ subplot(2,2,[1 2]);              %拉长单幅图
  plot(dist,cszw,'m-');
  hold on;
- plot(dist,zb_av,'b-');
+ plot(dist,zb_av,'bo-');
 %  if npt_plg~=0
 %     hold on; 
 %     plot(dist(npt_plg),cszw(npt_plg),'co');            %标记潜入点
@@ -231,19 +233,19 @@ end
 %  title(g_title);
  hold off;
  
-%  subplot(2,2,3);
-%  plot(dist,csqq,'b-');
-%  hold on;
-%  plot([dist(1),dist(end)],[0,0]);           %添加0网格线
-%  title('CSQQ');
-%  hold off;
-%  
-%  subplot(2,2,4);
-%  plot(dist,sus,'g-');
-%  hold on;
-%  plot(dist,scc,'k-');
-%  hold off;
-%  title('SUS and SCC');
+ subplot(2,2,3);
+ plot(dist,csqq,'b-');
+ hold on;
+ plot([dist(1),dist(end)],[0,0]);           %添加0网格线
+ title('CSQQ');
+ hold off;
+ 
+ subplot(2,2,4);
+ plot(dist,sus,'g-');
+ hold on;
+ plot(dist,scc,'k-');
+ hold off;
+ title('SUS and SCC');
 axis([-inf,inf,-inf,inf]);            %adjust the axis
 set(gca,'Xtick',min(dist):10:max(dist));           %设置分度数字标识
  title(g_title);    
