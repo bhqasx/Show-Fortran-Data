@@ -1,5 +1,5 @@
 function [dist, zb_av0, zb_av, zw_max]=ShowFig(handles)
-FrameJump=2;        %frame refreshing rate
+FrameJump=4;        %frame refreshing rate
 DrawMode=1;         %=0, draw turbidity current and open channel current; =1, only draw open channel; =2 only draw the levels of surface and and interface.
                                %0 and 1 are determined automatically
 
@@ -35,7 +35,7 @@ set(gcf,'WindowButtonDownFcn',@LeftClickFcn);
 if yn_video==1
     vidObj=VideoWriter('TbVideo.avi');
     open(vidObj);
-    set(gcf,'Position',[680,558,1000,350]);        %set the figure size
+    set(gcf,'Position',[680,558,1000,420]);        %set the figure size
 end
 
 jump=1;
@@ -95,7 +95,15 @@ while file_id>=3           %open successfully
                 NetSFlx(k)=a{1}(head_col.NetSFlx);
             end
         end
-       
+        
+        if first_flag==1         %record the initial state
+            dist0=dist;
+            zb_av0=zb_av;
+            cszw0=cszw;
+            csBW0=csBW;
+            first_flag=0;
+        end        
+        
         if (DrawMode~=1)||(MarkPP==1)
             npt_plg=0;
             for k=1:1:nCS
@@ -104,16 +112,7 @@ while file_id>=3           %open successfully
                     break;
                 end
             end
-        end
-        
-        if first_flag==1         %record the initial state
-            dist0=dist;
-            zb_av0=zb_av;
-            cszw0=cszw;
-            csBW0=csBW;
-            first_flag=0;
-        end
-               
+        end        
 %------------------------------plot----------------------------------
        if jump==FrameJump
            set(0,'CurrentFigure',fh)          %set current figue, this trick instead of figure(fh) helps to prevent the current figure getting focus over and over again
@@ -200,7 +199,7 @@ end
 if any(tb_zi>0)==1       %plot the interface
     if filter==1
         for i=npt_plg+1:1:nCS
-            if (tbsus(i)<5.0)
+            if (tbsus(i)<3.0)
                 tb_zi(i)=zb_av(i);
             end
         end
@@ -216,8 +215,6 @@ plot(dist,zb_av,'b-');
 axis([-inf,inf,-inf,inf]);            %adjust the axis
 set(gca,'Xtick',min(dist):10:max(dist));           %设置分度数字标识
 title(g_title);
-xlabel('x (km)');
-ylabel('高程(m)');
 hold off;
 
 end
@@ -238,7 +235,6 @@ end
  
  subplot(2,2,3);
  plot(dist,csqq,'b-');
- %ylim([0,10000]);          %设置y轴范围
  hold on;
  plot([dist(1),dist(end)],[0,0]);           %添加0网格线
  title('CSQQ');
