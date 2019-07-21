@@ -22,7 +22,7 @@ function varargout = RiverMoniter(varargin)
 
 % Edit the above text to modify the response to help RiverMoniter
 
-% Last Modified by GUIDE v2.5 17-Oct-2017 21:56:07
+% Last Modified by GUIDE v2.5 21-Jul-2019 10:51:10
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -137,6 +137,8 @@ set(hObject,'Value',1);
 set(handles.radiobutton2,'Value',0);
 set(handles.radiobutton3,'Value',0);
 handles.DrawMode=0;
+handles.ylim_min.Enable='off';
+handles.ylim_max.Enable='off';
 guidata(hObject, handles);
 
 
@@ -151,6 +153,8 @@ set(hObject,'Value',1);
 set(handles.radiobutton1,'Value',0);
 set(handles.radiobutton3,'Value',0);
 handles.DrawMode=1;
+handles.ylim_min.Enable='on';
+handles.ylim_max.Enable='on';
 guidata(hObject, handles);
 
 
@@ -165,6 +169,8 @@ set(hObject,'Value',1);
 set(handles.radiobutton1,'Value',0);
 set(handles.radiobutton2,'Value',0);
 handles.DrawMode=2;
+handles.ylim_min.Enable='off';
+handles.ylim_max.Enable='off';
 guidata(hObject, handles);
 
 
@@ -196,4 +202,67 @@ function checkbox3_Callback(hObject, eventdata, handles)
 
 % Hint: get(hObject,'Value') returns toggle state of checkbox3
 handles.yn_video=get(hObject,'Value');
+guidata(hObject, handles);
+
+
+
+function ylim_min_Callback(hObject, eventdata, handles)
+% hObject    handle to ylim_min (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of ylim_min as text
+%        str2double(get(hObject,'String')) returns contents of ylim_min as a double
+str_tmp=get(hObject,'String');
+if isempty(str_tmp)
+    handles.ylim_minV=-Inf;
+else
+    handles.ylim_minV=str2double(str_tmp);
+end
+guidata(hObject, handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function ylim_min_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to ylim_min (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+handles.ylim_minV=-Inf;
+guidata(hObject, handles);
+
+
+function ylim_max_Callback(hObject, eventdata, handles)
+% hObject    handle to ylim_max (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of ylim_max as text
+%        str2double(get(hObject,'String')) returns contents of ylim_max as a double
+str_tmp=get(hObject,'String');
+if isempty(str_tmp)
+    handles.ylim_maxV=Inf;
+else
+    handles.ylim_maxV=str2double(str_tmp);
+end
+guidata(hObject, handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function ylim_max_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to ylim_max (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+handles.ylim_maxV=Inf;
 guidata(hObject, handles);

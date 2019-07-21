@@ -187,6 +187,7 @@ disp('finished');
 if yn_video==1
     close(vidObj);
 end
+fclose('all');
 
 %-----------------------nested function----------------------------
 function draw_zw
@@ -231,6 +232,7 @@ end
 %     plot(dist(npt_plg),cszw(npt_plg),'co');            %标记潜入点
 %  end
 %  title(g_title);
+axis([-inf, inf, handles.ylim_minV, handles.ylim_maxV]);
  hold off;
  
  subplot(2,2,3);
