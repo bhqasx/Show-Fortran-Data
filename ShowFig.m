@@ -27,6 +27,8 @@ tb_zi=zeros(1,nCS);                    %elevation of the interface between two l
 tbqq=zeros(1,nCS);                   %discharge of turbidity flow
 tbsus=zeros(1,nCS);                   %concentration of suspended load(kg/m3)
 NetSFlx=zeros(1,nCS);                %垂向泥沙净通量
+csqbstar=zeros(1,nCS);
+csqb=zeros(1,nCS);
 
 first_flag=1;        %flag to mark the first step
 
@@ -61,6 +63,8 @@ while file_id>=3           %open successfully
         head_col.tbqq=get_head_col('TbQQ');
         head_col.tbsus=get_head_col('TbSUS');
         head_col.NetSFlx=get_head_col('NetSFlx');
+        head_col.csqbstar=get_head_col('csqbstar');
+        head_col.csqb=get_head_col('csqb');
         
         DrawMode=DrawMode0;
         if (head_col.tb_zi==0&&DrawMode~=1) 
@@ -78,6 +82,14 @@ while file_id>=3           %open successfully
             csBW(k)=a{1}(head_col.csBW);
             sus(k)=a{1}(head_col.sus);
             scc(k)=a{1}(head_col.scc);
+            
+            try
+                csqbstar(k)=a{1}(head_col.csqbstar);
+                csqb(k)=a{1}(head_col.csqb);
+            catch
+                NoBedLd=1;
+            end
+            
             try
                 idx_plg(k)=a{1}(head_col.idx_plg);       %if the colume of idx_plg exsits, the turbidity current exsits
                 MarkPP=1;
@@ -223,34 +235,34 @@ end
 %-----------------------nested function----------------------------
  function draw_open_chan
  
- subplot(2,2,[1 2]);              %拉长单幅图
- plot(dist,cszw,'m-');
- hold on;
- plot(dist,zb_av,'bo-');
-%  if npt_plg~=0
-%     hold on; 
-%     plot(dist(npt_plg),cszw(npt_plg),'co');            %标记潜入点
-%  end
-%  title(g_title);
-axis([-inf, inf, handles.ylim_minV, handles.ylim_maxV]);
- hold off;
- 
- subplot(2,2,3);
- plot(dist,csqq,'b-');
- hold on;
- plot([dist(1),dist(end)],[0,0]);           %添加0网格线
- title('CSQQ');
- hold off;
- 
- subplot(2,2,4);
- plot(dist,sus,'g-');
- hold on;
- plot(dist,scc,'k-');
- hold off;
- title('SUS and SCC');
-axis([-inf,inf,-inf,inf]);            %adjust the axis
-set(gca,'Xtick',min(dist):10:max(dist));           %设置分度数字标识
- title(g_title);    
+     subplot(2,2,[1 2]);              %拉长单幅图
+     plot(dist,cszw,'m-');
+     hold on;
+     plot(dist,zb_av,'bo-');
+     %  if npt_plg~=0
+     %     hold on;
+     %     plot(dist(npt_plg),cszw(npt_plg),'co');            %标记潜入点
+     %  end
+     %  title(g_title);
+     axis([-inf, inf, handles.ylim_minV, handles.ylim_maxV]);
+     hold off;
+     
+     subplot(2,2,3);
+     plot(dist,csqq,'b-');
+     hold on;
+     plot([dist(1),dist(end)],[0,0]);           %添加0网格线
+     title('CSQQ');
+     hold off;
+     
+     subplot(2,2,4);
+     plot(dist,sus,'g-');
+     hold on;
+     plot(dist,scc,'k-');
+     hold off;
+     title('SUS and SCC');
+     axis([-inf,inf,-inf,inf]);            %adjust the axis
+     set(gca,'Xtick',min(dist):10:max(dist));           %设置分度数字标识
+     title(g_title);
  end
 %-----------------------------------------------------------------------
 %-----------------------nested function----------------------------
