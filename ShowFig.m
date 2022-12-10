@@ -246,7 +246,7 @@ end
      %     hold on;
      %     plot(dist(npt_plg),cszw(npt_plg),'co');            %标记潜入点
      %  end
-     %  title(g_title);
+     title(g_title);
      axis([-inf, inf, handles.ylim_minV, handles.ylim_maxV]);
      hold off;
      
@@ -270,28 +270,22 @@ end
          hold on;
          plot(dist, csqb, 'g-');
          hold off;
-         title('cs_qb* and csqb');
+         title('csqb* and csqb');
      end
      
      axis([-inf,inf,-inf,inf]);            %adjust the axis
-     set(gca,'Xtick',min(dist):10:max(dist));           %设置分度数字标识
-     title(g_title);
+     %set(gca,'Xtick',min(dist):10:max(dist));           %设置分度数字标识
  end
 %-----------------------------------------------------------------------
 %-----------------------nested function----------------------------
 function kkk=get_head_col(HdName)
-LL=strfind(hn{1},HdName);
+%LL=strfind(hn{1},HdName);
+LL=find(strcmp(hn{1}, HdName), 1);
 
-for j=1:n_head
-    kkk=isempty(LL{j});
-    if kkk==0
-        kkk=j;
-        break;
-    end
-end
-
-if kkk==1      %head not found
+if isempty(LL)
     kkk=0;
+else
+    kkk=LL;
 end
 
 end
