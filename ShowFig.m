@@ -27,13 +27,15 @@ tb_zi=zeros(1,nCS);                    %elevation of the interface between two l
 tbqq=zeros(1,nCS);                   %discharge of turbidity flow
 tbsus=zeros(1,nCS);                   %concentration of suspended load(kg/m3)
 NetSFlx=zeros(1,nCS);                %垂向泥沙净通量
-csqbstar=zeros(1,nCS);
+csqbstar=zeros(1,nCS);               %推移质平衡输沙率
 csqb=zeros(1,nCS);
 
 first_flag=1;        %flag to mark the first step
 
 fh=figure;
 set(gcf,'WindowButtonDownFcn',@LeftClickFcn);
+set(gcf, 'Position', [100 100 900 450]);
+
 if yn_video==1
     vidObj=VideoWriter('TbVideo.avi');
     open(vidObj);
@@ -83,6 +85,7 @@ while file_id>=3           %open successfully
             sus(k)=a{1}(head_col.sus);
             scc(k)=a{1}(head_col.scc);
             
+            NoBedLd=0;
             try
                 csqbstar(k)=a{1}(head_col.csqbstar);
                 csqb(k)=a{1}(head_col.csqb);
@@ -235,7 +238,7 @@ end
 %-----------------------nested function----------------------------
  function draw_open_chan
  
-     subplot(2,2,[1 2]);              %拉长单幅图
+     subplot(2,3,[1 2 3]);              %拉长单幅图
      plot(dist,cszw,'m-');
      hold on;
      plot(dist,zb_av,'bo-');
@@ -247,19 +250,29 @@ end
      axis([-inf, inf, handles.ylim_minV, handles.ylim_maxV]);
      hold off;
      
-     subplot(2,2,3);
+     subplot(2,3,4);
      plot(dist,csqq,'b-');
      hold on;
      plot([dist(1),dist(end)],[0,0]);           %添加0网格线
      title('CSQQ');
      hold off;
      
-     subplot(2,2,4);
+     subplot(2,3,5);
      plot(dist,sus,'g-');
      hold on;
      plot(dist,scc,'k-');
      hold off;
      title('SUS and SCC');
+     
+     if NoBedLd==0
+         subplot(2,3,6);
+         plot(dist, csqbstar, 'k-');
+         hold on;
+         plot(dist, csqb, 'g-');
+         hold off;
+         title('cs_qb* and csqb');
+     end
+     
      axis([-inf,inf,-inf,inf]);            %adjust the axis
      set(gca,'Xtick',min(dist):10:max(dist));           %设置分度数字标识
      title(g_title);
