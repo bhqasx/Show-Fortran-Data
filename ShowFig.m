@@ -173,6 +173,10 @@ while file_id>=3           %open successfully
                writeVideo(vidObj,currFrame);
            end
            pause(0.0001);
+           % Check if the left mouse button was clicked, and if so, pause the plot
+           if getappdata(gcf, 'is_paused')
+               pause;
+           end
            jump=1;
        else
            jump=jump+1;
@@ -191,7 +195,7 @@ while file_id>=3           %open successfully
        elseif c_char==' '
           pause;
           set(gcf,'CurrentCharacter','a');
-       end
+       end       
     end
     fclose(file_id);
     nfile=nfile+1;
@@ -266,9 +270,10 @@ end
      
      if NoBedLd==0
          subplot(2,3,6);
-         plot(dist, csqbstar, 'k-');
+         ics1=195;
+         plot(dist(ics1:end), csqbstar(ics1:end), 'k-');
          hold on;
-         plot(dist, csqb, 'g-');
+         plot(dist(ics1:end), csqb(ics1:end), 'g-');
          hold off;
          title('csqb* and csqb');
      end
@@ -294,7 +299,11 @@ end
 
 
 function LeftClickFcn(hObject,callbackdata)
-% pause;
+    % Check if the left mouse button was clicked
+    if strcmp(get(hObject, 'SelectionType'), 'normal')
+        % Set the 'is_paused' application data to true
+        setappdata(hObject, 'is_paused', true);
+    end
 end
 
         
