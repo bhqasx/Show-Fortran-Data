@@ -1,5 +1,5 @@
 function [dist, zb_av0, zb_av, zw_max]=ShowFig(handles)
-FrameJump=4;        %frame refreshing rate
+FrameJump=6;        %frame refreshing rate
 DrawMode=1;         %=0, draw turbidity current and open channel current; =1, only draw open channel; =2 only draw the levels of surface and and interface.
                                %0 and 1 are determined automatically
 
@@ -251,7 +251,7 @@ end
      %     plot(dist(npt_plg),cszw(npt_plg),'co');            %标记潜入点
      %  end
      title(g_title);
-     axis([-inf, inf, handles.ylim_minV, handles.ylim_maxV]);
+     axis([handles.xlim_minV, handles.xlim_maxV, handles.ylim_minV, handles.ylim_maxV]);
      hold off;
      
      subplot(2,3,4);
