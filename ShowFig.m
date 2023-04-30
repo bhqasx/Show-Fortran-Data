@@ -65,8 +65,8 @@ while file_id>=3           %open successfully
         head_col.tbqq=get_head_col('TbQQ');
         head_col.tbsus=get_head_col('TbSUS');
         head_col.NetSFlx=get_head_col('NetSFlx');
-        head_col.csqbstar=get_head_col('csqbstar');
-        head_col.csqb=get_head_col('csqb');
+        head_col.csqbstar=get_head_col('CSQbs');
+        head_col.csqb=get_head_col('CSQb');
         
         DrawMode=DrawMode0;
         if (head_col.tb_zi==0&&DrawMode~=1) 
@@ -270,12 +270,13 @@ end
      
      if NoBedLd==0
          subplot(2,3,6);
-         ics1=195;
+         ics1=240;
          plot(dist(ics1:end), csqbstar(ics1:end), 'k-');
          hold on;
          plot(dist(ics1:end), csqb(ics1:end), 'g-');
          hold off;
          title('csqb* and csqb');
+         legend('csqb*', 'csqb');
      end
      
      axis([-inf,inf,-inf,inf]);            %adjust the axis
