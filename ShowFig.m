@@ -6,6 +6,9 @@ DrawMode=1;         %=0, draw turbidity current and open channel current; =1, on
 nfile=0;
 file_id=fopen(['FCSLPF',num2str(nfile),'.TXT']);
 
+vline_flag=1;          %=1时画垂直辅助线
+xcs=[53, 55, 56, 58, 61];        %添加辅助线的断面位置
+
 %get user's setting
 nCS=handles.nCS;
 nplg_lim=handles.nplg_lim;             %限制潜入位置
@@ -42,7 +45,7 @@ if yn_video==1
     set(gcf,'Position',[680,558,1000,420]);        %set the figure size
 end
 
-jump=1;
+jump=3;
 
 while file_id>=3           %open successfully
     while ~feof(file_id)
@@ -138,6 +141,7 @@ while file_id>=3           %open successfully
                subplot(3,2,2);
                plot(dist,csqq,'b-');
                hold on;
+               addVerticalLine;
                plot([dist(1),dist(end)],[0,0]);           %添加0网格线
                title('CSQQ');
                hold off;                
@@ -145,6 +149,7 @@ while file_id>=3           %open successfully
                subplot(3,2,3);
                plot(dist,sus,'g-');
                hold on;
+               addVerticalLine;
                plot(dist,scc,'k-');
                hold off;
                title('SUS and SCC');
@@ -152,10 +157,16 @@ while file_id>=3           %open successfully
                if npt_plg~=0
                    subplot(3,2,4);
                    plot(dist(npt_plg+1:end),tbqq(npt_plg+1:end),'b-');
+                   hold on;
+                   addVerticalLine;
+                   hold off;
                    title('TbQQ');
                    
                    subplot(3,2,5);
                    plot(dist(npt_plg+1:end),tbsus(npt_plg+1:end),'g-');
+                   hold on;
+                   addVerticalLine;
+                   hold off;                   
                    title('TbSUS');
                    
                    subplot(3,2,6);
@@ -213,6 +224,7 @@ function draw_zw
 
 plot(dist,cszw,'m-');
 hold on;
+addVerticalLine;
 if npt_plg~=0
     plot(dist(npt_plg),cszw(npt_plg),'co');            %标记潜入点
 end
@@ -234,10 +246,27 @@ end
 plot(dist,zb_av,'b-');
 axis([-inf,inf,-inf,inf]);            %adjust the axis
 set(gca,'Xtick',min(dist):10:max(dist));           %设置分度数字标识
+
 title(g_title);
 hold off;
 
 end
+
+
+%-----------------------nested function----------------------------
+    function addVerticalLine
+        
+        if vline_flag==1
+            nline=numel(xcs);
+            for j=1:1:nline
+                xline=dist(xcs(j));
+                ylimits=get(gca, 'ylim');
+                line([xline xline], ylimits, 'Color', [0.5 0.5 0.5]);
+            end
+        end
+    end
+        
+
 %----------------------------------------------------------------------
 %-----------------------nested function----------------------------
  function draw_open_chan
