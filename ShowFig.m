@@ -280,7 +280,8 @@ end
      %     plot(dist(npt_plg),cszw(npt_plg),'co');            %标记潜入点
      %  end
      title(g_title);
-     axis([handles.xlim_minV, handles.xlim_maxV, handles.ylim_minV, handles.ylim_maxV]);
+     %axis([handles.xlim_minV, handles.xlim_maxV, handles.ylim_minV, handles.ylim_maxV]);
+     axis([-inf, inf, handles.ylim_minV, handles.ylim_maxV]);
      hold off;
      
      subplot(2,3,4);
