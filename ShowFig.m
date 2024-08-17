@@ -6,7 +6,7 @@ DrawMode=1;         %=0, draw turbidity current and open channel current; =1, on
 nfile=0;
 file_id=fopen(['FCSLPF',num2str(nfile),'.TXT']);
 
-vline_flag=1;          %=1时画垂直辅助线
+vline_flag=0;          %=1时画垂直辅助线
 xcs=[53, 55, 56, 58, 61];        %添加辅助线的断面位置
 
 %get user's setting
