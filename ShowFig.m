@@ -4,7 +4,14 @@ DrawMode=1;         %=0, draw turbidity current and open channel current; =1, on
                                %0 and 1 are determined automatically
 
 nfile=0;
-file_id=fopen(['FCSLPF',num2str(nfile),'.TXT']);
+[filename,path,FilterIndex]=uigetfile('*.*', '请选择FCSLPF文件');
+if isequal(filename, 0) || isequal(path, 0)
+    %如果用户点取消，则直接读取当前目录下的FCSLPF文件
+    file_id=fopen(['FCSLPF',num2str(nfile),'.TXT']);
+else
+    fpath=[path,filename];
+    file_id=fopen(fpath);
+end
 
 vline_flag=0;          %=1时画垂直辅助线
 xcs=[53, 55, 56, 58, 61];        %添加辅助线的断面位置
